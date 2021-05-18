@@ -88,3 +88,6 @@ def game() -> None:
     # If while is broken we have avoided the death for now
     print("You made it through")
     return 0
+
+if __name__ == "__main__":
+    game()
