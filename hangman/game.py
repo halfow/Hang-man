@@ -4,16 +4,32 @@ Hang-a-man game
 import functools
 import re
 import os
-from random import choice
 import string
+import json
+
+from random_word import RandomWords
 
 import hangman.resources
+
+
+from random import randrange
+from datetime import timedelta, datetime
+
+def random_date():
+    fmt =  r"%Y-%m-%d"
+    start = datetime.strptime("2018-01-01", fmt)
+    delta = datetime.now() - start
+    int_delta = (delta.days * 24 * 60 * 60) + delta.seconds
+    random_second = randrange(int_delta)
+    time = start + timedelta(seconds=random_second)
+    return time.strftime(fmt)
 
 
 def game() -> None:
     # Get random name from database
     # TODO: Pass name/word as argument instead
-    name = choice(hangman.resources.names).lower()
+    name, definitions = json.loads(RandomWords().word_of_the_day(date=str(random_date()))).values()
+    
 
     assert set(name).issubset(string.ascii_lowercase), NameError(
         "Name contained illegal characters"
@@ -82,11 +98,17 @@ def game() -> None:
 
     else:  # No break clause (if we reached last gallow image we lost)
         _stats()
-        print(f"You lost, how could you not have guessed {name}?")
+        print(
+            f"You lost, how could you not have guessed {name}?\n",
+        json.dumps(definitions, indent=4)
+        )
         return 1
 
     # If while is broken we have avoided the death for now
-    print("You made it through")
+    print(
+        "You made it through\n",
+        json.dumps(definitions, indent=4)
+    )
     return 0
 
 if __name__ == "__main__":
